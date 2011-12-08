@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<style>
+			.stoptastic-outer{
+				border-radius: 3px;
+				border: 2px solid black;
+				padding: 5px;
+				display: inline-block;
+			}
+			.stoptastic-inner{
+				border-radius: 3px;
+				border: 2px solid black;
+				padding 3px;
+				text-align: center;
+				margin-bottom: 3px;
+			}
+			.stoptastic-hours, 
+				.stoptastic-minutes,
+				.stoptastic-seconds{ font-weight: bold; font-size: large; }
+		</style>
+	</head>
+	<body>
+		<div id="stop1"></div>
+		<div id="stop2"></div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="../jquery.stoptastic.js"></script>
+		<script>
+			$("#stop1").stoptastic();
+			$("#stop2").stoptastic();
+		</script>
+	</body>
+</html>
