@@ -1,14 +1,14 @@
 /*
- * jQuery Stopwatch Thing
- */ 
- 
-/*jslint devel: true, browser: true, white: true, maxerr: 50, indent: 2, unparam: true */
+* jQuery Stopwatch Thing
+*/
+
+/*jslint plusplus: true, devel: true, browser: true, white: true, maxerr: 50, indent: 2, unparam: true */
 /*global jQuery : false, $ : false */
 
 (function($){
+  "use strict";
   var initialRender,
       renderTime,
-      tick,
       msToArray,
       zeroPad,
       // States
@@ -38,17 +38,19 @@
   //zeroPad(10, 2) => "10"
   //zeroPad(10, 3) => "010"
   zeroPad = function( toPad, digits ){
-    var neededZeros = digits - (toPad + "").length, padding = "";
-    for( var i = neededZeros; i > 0; i-- ){
+    var i = 0, 
+        neededZeros = digits - (toPad.toString()).length, 
+        padding = "";
+    for( i = neededZeros; i > 0; i-- ){
       padding += "0";
     }
-    return padding + (toPad + "");
+    return padding + (toPad.toString());
   };
   
   initialRender = function( renderInto ){
     var structure = "<div class='stoptastic-outer'><div class='stoptastic-inner'>" +  
         "<span class='stoptastic-hours'></span>:<span class='stoptastic-minutes'></span>:<span class='stoptastic-seconds'></span>.<span class='stoptastic-fractional'></span></div>" + 
-        "<div class='stoptastic-controls'><input type='button' class='stoptastic-startStop' value='Start'/><input type='button' class='stoptastic-lapReset' value='Reset'/></div></div>"
+        "<div class='stoptastic-controls'><input type='button' class='stoptastic-startStop' value='Start'/><input type='button' class='stoptastic-lapReset' value='Reset'/></div></div>";
     renderInto.html(structure);
     renderTime( renderInto, 0 );
   };
@@ -64,6 +66,7 @@
   
   
   $.fn.stoptastic = function(){
+    //closure scope variables
     var $this = $(this), 
         startTime, stopTime,
         startStopClickHandler,
@@ -72,21 +75,27 @@
         ticker = null,
         currentState = stateNew;
         
+    //keep updating the UI
     tick = function(){
       var elapsed = new Date().getTime() - startTime;      
       renderTime($this, elapsed);
       ticker = setTimeout(tick, 50);
     };
-        
+      
     startStopClickHandler = function(){
+      var elapsed, 
+          now = new Date().getTime(),
+          gap,
+          originalElapsed;
+          
+      //handle states
       if( currentState === stateNew ){
         startTime = new Date().getTime();
         stopTime = null;
         setTimeout(tick, 50);
         currentState = stateRunning;
       }
-      else if( currentState === stateRunning ){
-        var elapsed;
+      else if( currentState === stateRunning ){        
         stopTime = new Date().getTime();        
         elapsed = stopTime - startTime;
         currentState = stateStopped;
@@ -94,9 +103,7 @@
         renderTime( $this, elapsed );
       }
       else if( currentState === stateStopped ){
-        var now = new Date().getTime(), 
-            gap,
-            originalElapsed = stopTime - startTime;
+        originalElapsed = stopTime - startTime;
         gap = now - stopTime;
         startTime = now - originalElapsed;
         stopTime = null;
@@ -104,13 +111,13 @@
         currentState = stateRunning;
       }
       
+      //update UI
       $this.find(".stoptastic-startStop").val(currentState.startStop);
       $this.find(".stoptastic-lapReset").val(currentState.lapReset);
     };
     
     lapResetClickHandler = function(){
-      if( currentState === stateNew ){}
-      else if( currentState === stateRunning ){
+      if( currentState === stateRunning ){
         clearTimeout(ticker);
         renderTime( $this, 0 );
         startTime = null;
@@ -123,10 +130,13 @@
         stopTime = null;
         currentState = stateNew;
       }
+      //Unused: else if( currentState === stateNew ){}
       
       $this.find(".stoptastic-startStop").val(currentState.startStop);
       $this.find(".stoptastic-lapReset").val(currentState.lapReset);
     };
+    
+    //create a closure and do the actual setup
     return (function(){
       currentState = stateNew;
       initialRender($this);
